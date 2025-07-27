@@ -181,9 +181,28 @@ python main.py incremental_run \
 
 > **CIFAR‑100**
 
-| Dataset      | Backbone  | Download                                                                                               |
-| ------------ |-----------| ------------------------------------------------------------------------------------------------------ |
-| CIFAR‑100    | ResNet‑18 | [`biag_cifar100_res12.pt`](https://github.com/your-repo/releases/download/v0.1/biag_cifar100_res12.pt) |
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">Dataset</th>
+      <th colspan="3">ResNet‑18</th>
+    </tr>
+    <tr>
+      <th>backbone</th>
+      <th>classifier</th>
+      <th>biag</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CIFAR‑100</td>
+      <td><a href="https://github.com/<owner>/<repo>/releases/download/<tag>/backbone_resnet18.pt">backbone_resnet18.pt</a></td>
+      <td><a href="https://github.com/<owner>/<repo>/releases/download/<tag>/classifier_cifar100_res18.pt">classifier_cifar100_res18.pt</a></td>
+      <td><a href="https://github.com/<owner>/<repo>/releases/download/<tag>/biag_cifar100_res18.pt">biag_cifar100_res18.pt</a></td>
+    </tr>
+  </tbody>
+</table>
+
 
 ---
 
@@ -200,8 +219,8 @@ python main.py incremental_run \
 **CIFAR‑100 (this repo, WIP):**
 
 | Dataset      | Session‑0 | Final session | Paper (final) |
-| ------------ |:---------:|:-------------:|:------------:|
-| CIFAR‑100    |   83.08   |               |              |
+| ------------ |:---------:|:-------------:|:-------------:|
+| CIFAR‑100    |   82.92   |     49.74     |     63.88     |
 
 Log files can be found under `logs/`.
 
