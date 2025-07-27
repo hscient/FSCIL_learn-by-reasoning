@@ -179,14 +179,9 @@ python main.py incremental_run \
 
 ## Pre‑trained Checkpoints
 
-> **CIFAR‑100**
-> Resnet18 for backbone, classifier train
+> pretrained weights are trained by resnet18 for CIFAR-100
 
-| backbone                                                                                                | classifier                                                                                                               | biag                                                                                         |
-| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |----------------------------------------------------------------------------------------------|
-| [`backbone_18.pt`](sha256:53201068fb6cdbb3e35b2444f241de89379eaee0e3cba5e6307e0c2a69513c01) | [`classifier_18.pt`](sha256:94fff698dfbce5326fee80c07d9ddfe7893a45b4886c1b46e38483653c087de8) | [`biag_18_last.pt`](sha256:eda1fbbbfdc16904ca99ce529c286ac2dc7421d87b1119630759145cc319220a) |
-
-
+https://github.com/hscient/FSCIL_learn-by-reasoning/releases/tag/weights-cifar100-res18-2025-07-27
 
 ---
 
