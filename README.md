@@ -25,7 +25,7 @@
 
 ### Tested platforms
 
-* **Google Colab** (T4 / A100)
+* Google Colab (T4 / A100)
 * Ubuntu 22.04 + CUDA 11.8
 * Windows 10 local CUDA 12.6 + `torch==2.7.1+cu126`
 
@@ -39,7 +39,7 @@
   the repo gives a download link **[here](https://drive.google.com/drive/folders/11LxZCQj2FRCs0JTsf_dafvTHqFn2yGSN)**.
   you can download the dataset and unzip it under code/data folder
 
-> **Note**: miniImageNet follows the **CEC** split (60 base + 40 novel). 
+> **Note**: CIFAR‑100 & miniImageNet follows the **CEC** split (60 base + 40 novel). 
 
 **Session configuration (examples):**
 
@@ -56,7 +56,7 @@ the code was tested three execution environments : **Linux Ubuntu Docker**, **Go
 
 ### 1) Docker 
 
-Ready‑to‑use images are published on **Docker Hub**.
+Ready‑to‑use images are published on Docker Hub.
 
 1. Quick start
 
@@ -112,17 +112,13 @@ python main.py incremental_run \
 
 Open the notebook in your browser—no local setup required.
 
-* **Open in Colab:**
-  [Open in Colab](https://colab.research.google.com/github/<USER>/<REPO>/blob/main/notebooks/biag_colab.ipynb)
-
-* **Badge for this README:**
-
-```markdown
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](
-https://colab.research.google.com/github/<USER>/<REPO>/blob/main/notebooks/biag_colab.ipynb)
-```
+https://colab.research.google.com/github/hscient/FSCIL_learn-by-reasoning/blob/main/Learn_by_reasoning.ipynb)
+
+[Open in Colab](https://colab.research.google.com/github/hscient/FSCIL_learn-by-reasoning/blob/main/Learn_by_reasoning.ipynb)
 
 The Colab notebook installs dependencies, downloads datasets (or mounts Drive), and exposes the same CLI commands as below.
+for miniImageNet dataset, you should mount dataset to google drive
 
 ---
 
