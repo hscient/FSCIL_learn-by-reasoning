@@ -58,6 +58,7 @@ def load_state(args=None):
                           backbone.out_dim, device=device)
         protos = torch.cat([protos, pad], dim=0)
 
+    print(f"proto_path :{proto_path}")
     # BiAG
     biag = BiAGWrapper(backbone.out_dim).to(device)
     biag_path = Path(args.biag) if args.biag else exp_dir / "biag_pt_last.pt"
