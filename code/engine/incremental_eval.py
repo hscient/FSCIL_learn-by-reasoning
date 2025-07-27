@@ -60,11 +60,8 @@ def load_state(args=None):
 
     # BiAG
     biag = BiAGWrapper(backbone.out_dim).to(device)
-    biag_path = (
-        Path(args.biag)
-        if getattr(args, "biag", None)                     # default arg path
-        else Path(args.output_dir) / args.dataset / "biag_pt_last.pt"
-    )
+    biag_path = Path(args.biag) if args.biag else exp_dir / "biag_pt_last.pt"
+    print(f"biag_path :{biag_path}")
     biag.load_state_dict(torch.load(biag_path, map_location=device))
     biag.eval()
 
