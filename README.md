@@ -184,7 +184,6 @@ python main.py incremental_run \
 <table>
   <thead>
     <tr>
-      <th rowspan="2">Dataset</th>
       <th colspan="3">ResNet‑18</th>
     </tr>
     <tr>
@@ -195,7 +194,6 @@ python main.py incremental_run \
   </thead>
   <tbody>
     <tr>
-      <td>CIFAR‑100</td>
       <td><a href="https://github.com/<owner>/<repo>/releases/download/<tag>/backbone_resnet18.pt">backbone_resnet18.pt</a></td>
       <td><a href="https://github.com/<owner>/<repo>/releases/download/<tag>/classifier_cifar100_res18.pt">classifier_cifar100_res18.pt</a></td>
       <td><a href="https://github.com/<owner>/<repo>/releases/download/<tag>/biag_cifar100_res18.pt">biag_cifar100_res18.pt</a></td>
