@@ -180,26 +180,12 @@ python main.py incremental_run \
 ## Pre‑trained Checkpoints
 
 > **CIFAR‑100**
+> Resnet18 for backbone, classifier train
 
-<table>
-  <thead>
-    <tr>
-      <th colspan="3">ResNet‑18</th>
-    </tr>
-    <tr>
-      <th>backbone</th>
-      <th>classifier</th>
-      <th>biag</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><a href="https://github.com/<owner>/<repo>/releases/download/<tag>/backbone_resnet18.pt">backbone_resnet18.pt</a></td>
-      <td><a href="https://github.com/<owner>/<repo>/releases/download/<tag>/classifier_cifar100_res18.pt">classifier_cifar100_res18.pt</a></td>
-      <td><a href="https://github.com/<owner>/<repo>/releases/download/<tag>/biag_cifar100_res18.pt">biag_cifar100_res18.pt</a></td>
-    </tr>
-  </tbody>
-</table>
+| backbone                                                                                                | classifier                                                                                                               | biag                                                                                         |
+| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |----------------------------------------------------------------------------------------------|
+| [`backbone_18.pt`](sha256:53201068fb6cdbb3e35b2444f241de89379eaee0e3cba5e6307e0c2a69513c01) | [`classifier_18.pt`](sha256:94fff698dfbce5326fee80c07d9ddfe7893a45b4886c1b46e38483653c087de8) | [`biag_18_last.pt`](sha256:eda1fbbbfdc16904ca99ce529c286ac2dc7421d87b1119630759145cc319220a) |
+
 
 
 ---
