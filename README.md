@@ -7,12 +7,12 @@
 
 ## Table of Contents
 
-1. [Environment](#environment)
-2. [Data Preparation](#data-preparation)
-3. [Getting Started](#getting-started)
-4. [Pre‑trained Checkpoints](#pre-trained-checkpoints)
-5. [Benchmark Results](#benchmark-results)
-6. [Docker Usage](#docker-usage)
+1. [Environment](#Environment)
+2. [Docker Usage](#docker-usage)
+3. [Data Preparation](#data-preparation)
+4. [Getting Started](#getting-started)
+5. [Pre‑trained Checkpoints](#pre-trained-checkpoints)
+6. [Benchmark Results](#benchmark-results)
 7. [Issue Tracker & TODO](#issue-tracker--todo)
 8. [Acknowledgment](#acknowledgment)
 9. [Colab Sharing](#colab-sharing)
@@ -23,15 +23,48 @@
 
 ## Environment
 
-> ### Quick start (Docker)
+### Tested platforms
 
-Prebuilt Docker image on Docker Hub:
+* **Google Colab** (T4 / A100)
+* Ubuntu 22.04 + CUDA 11.8
+* Windows 10 local CUDA 12.6 + `torch==2.7.1+cu126`
 
-1. Pull the image
+---
 
-```bash
-docker pull airiter/biag-fscil:latest
-```
+## Data Preparation
+
+* **CIFAR‑100** is downloaded automatically via `torchvision`.
+* For **miniImageNet**, use the data link provided by the
+  [CEC‑CVPR2021 repository](https://github.com/icoz69/CEC-CVPR2021?tab=readme-ov-file);
+  the repo gives a download link **[here](https://drive.google.com/drive/folders/11LxZCQj2FRCs0JTsf_dafvTHqFn2yGSN)**.
+  you can download the dataset and unzip it under code/data folder
+
+> **Note**: miniImageNet follows the **CEC** split (60 base + 40 novel). 
+
+**Session configuration (examples):**
+
+| Dataset             | Base session          | #Incremental sessions  | Shots |
+| ------------------- |-----------------------|------------------------| :---: |
+| CIFAR‑100           | 60 classes × 500 imgs | 8 sessions × 5 classes |   5   |
+| miniImageNet        | 60 classes × 600 imgs | 9 sessions × 5 classes |   5   |
+
+---
+
+## Getting Started
+
+the code was tested three execution environments : **Linux Ubuntu Docker**, **Google Colab**, and **Local (Windows)**.
+
+### 1) Docker 
+
+Ready‑to‑use images are published on **Docker Hub**.
+
+1. Quick start
+
+| Action                 | Command                                 | When to use                                              |
+| ---------------------- | --------------------------------------- | -------------------------------------------------------- |
+| **Pull** (recommended) | `docker pull airiter/biag-fscil:latest` | just want to *use* the code – faster start‑up, reproducible. |
+| **Build**              | `docker build -t biag/fscil:latest .`   | modified the source or need a custom CUDA/cuDNN base.    |
+
 
 2. base train example
 
@@ -73,71 +106,6 @@ python main.py incremental_run \
   --show_config
 ```
 
-### Tested platforms
-
-* **Google Colab** (T4 / A100)
-* Ubuntu 22.04 + CUDA 11.8
-* Windows 10 local CUDA 12.6 + `torch==2.7.1+cu126`
-
----
-
-## Data Preparation
-
-* **CIFAR‑100** is downloaded automatically via `torchvision`.
-* For **miniImageNet**, use the data link provided by the
-  [CEC‑CVPR2021 repository](https://github.com/icoz69/CEC-CVPR2021?tab=readme-ov-file);
-  the repo gives a download link **[here](https://drive.google.com/drive/folders/11LxZCQj2FRCs0JTsf_dafvTHqFn2yGSN)**.
-  you can download the dataset and unzip it under code/data folder
-
-> **Note**: miniImageNet follows the **CEC** split (60 base + 40 novel). Make sure your version matches.
-
-**Session configuration (examples):**
-
-| Dataset             | Base session          | #Incremental sessions  | Shots |
-| ------------------- |-----------------------|------------------------| :---: |
-| CIFAR‑100           | 60 classes × 500 imgs | 8 sessions × 5 classes |   5   |
-| miniImageNet        | 60 classes × 600 imgs | 9 sessions × 5 classes |   5   |
-
----
-
-## Getting Started
-
-the code was tested three execution environments : **Linux Ubuntu Docker**, **Google Colab**, and **Local (Windows)**.
-
-### 1) Docker 
-
-Ensure Docker is installed and the NVIDIA runtime is available if you plan to use GPUs.
-
-```bash
-# Pull a prebuilt image
-docker pull airiter/biag-fscil:latest
-
-# See CLI options (CPU dry run)
-docker run --rm -it airiter/biag-fscil:latest python main.py --help
-
-# Example: train base module on CIFAR-100 with GPU
-docker run --gpus all --rm -it \
-  -v $PWD:/workspace -w /workspace \
-  airiter/biag-fscil:latest \
-  python main.py base \
-    --dataset cifar100 \
-    --epochs 500 \
-    --backbone_model resnet18 \
-    --batch_size 128 \
-    --pt_backbone checkpoints/cifar100/backbone_18.pt \
-    --pt_classifier checkpoints/cifar100/classifier_18.pt \
-    --pt_proto checkpoints/cifar100/prototype_18.pt \
-    --num_workers 2 \
-    --show_config \
-    --save_config ./cfg_after_cli.json
-```
-
-**Checkpoint defaults (when not specified):**
-
-* `--pt_backbone`: `checkpoints/<dataset>/backbone_pt_last.pt`
-* `--pt_classifier`: `checkpoints/<dataset>/classifier_pt_last.pt`
-* `--pt_proto`: `checkpoints/<dataset>/proto_pt_last.pt`
-
 ---
 
 ### 2) Google Colab (One‑click)
@@ -160,7 +128,7 @@ The Colab notebook installs dependencies, downloads datasets (or mounts Drive), 
 
 ### 3) Local (Windows)
 
-**Tested:** Python 3.12, CUDA 12.6, requirement_local.txt library versions
+**Tested:** Python 3.12, CUDA 12.6, requirement_local.txt includes all library version tested
 
 **A. Base Module Training (CIFAR‑100)**
 
@@ -207,25 +175,19 @@ python main.py incremental_run \
 
 **Notes**
 
-* **Datasets**
-
-  * CIFAR‑100 is downloaded automatically via `torchvision`.
-  * miniImageNet: download from the CEC repository (see **Datasets and pretrained models** 
-  
 * **Logs & Checkpoints**
 
   * Logs are saved under `logs/`.
-  * Pre‑trained checkpoints can be placed under `${LOGLOC}` and used with `--resume-from` for evaluation‑only runs.
 
 ---
 
 ## Pre‑trained Checkpoints
 
-> I've test Cifar100 with paper
+> **CIFAR‑100**
 
 | Dataset      | Backbone  | Download                                                                                               |
-| ------------ | --------- | ------------------------------------------------------------------------------------------------------ |
-| CIFAR‑100    | ResNet‑12 | [`biag_cifar100_res12.pt`](https://github.com/your-repo/releases/download/v0.1/biag_cifar100_res12.pt) |
+| ------------ |-----------| ------------------------------------------------------------------------------------------------------ |
+| CIFAR‑100    | ResNet‑18 | [`biag_cifar100_res12.pt`](https://github.com/your-repo/releases/download/v0.1/biag_cifar100_res12.pt) |
 
 ---
 
@@ -246,17 +208,6 @@ python main.py incremental_run \
 | CIFAR‑100    |           |               |              |
 
 Log files can be found under `logs/`.
-
----
-
-## Docker Usage
-
-Ready‑to‑use images are published on **Docker Hub**.
-
-| Action                 | Command                                 | When to use                                                      |
-| ---------------------- | --------------------------------------- | ---------------------------------------------------------------- |
-| **Pull** (recommended) | `docker pull airiter/biag-fscil:latest` | You just want to *use* the code – faster start‑up, reproducible. |
-| **Build**              | `docker build -t biag/fscil:latest .`   | You modified the source or need a custom CUDA/cuDNN base.        |
 
 ---
 
