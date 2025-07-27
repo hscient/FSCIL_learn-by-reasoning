@@ -42,8 +42,8 @@ def main(args: argparse.Namespace | None = None):
     for p in (pt_backbone, pt_classifier, pt_proto):
         p.parent.mkdir(parents=True, exist_ok=True)
 
-    if confirm_overwrite([pt_backbone, pt_classifier, pt_proto], tag="biag"):
-        print("[biag] Skipping.")
+    if confirm_overwrite([pt_backbone, pt_classifier, pt_proto], tag="base"):
+        print("[base] Skipping.")
         return
 
     # Data & model

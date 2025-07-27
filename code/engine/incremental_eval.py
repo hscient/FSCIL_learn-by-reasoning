@@ -84,6 +84,7 @@ def evaluate(loaders, state):
 
     # base
     acc0 = _accuracy(joint, loaders["d0_test"], device)
+    print(f"[sess0] acc={acc0:5.2f}")
     acc_sess.append(acc0)
     prev_seen = set(loaders["class_splits"]["base"])
 
