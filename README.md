@@ -115,8 +115,6 @@ Open the notebook in your browser—no local setup required.
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](
 https://colab.research.google.com/github/hscient/FSCIL_learn-by-reasoning/blob/main/Learn_by_reasoning.ipynb)
 
-[Open in Colab](https://colab.research.google.com/github/hscient/FSCIL_learn-by-reasoning/blob/main/Learn_by_reasoning.ipynb)
-
 The Colab notebook installs dependencies, downloads datasets (or mounts Drive), and exposes the same CLI commands as below.
 for miniImageNet dataset, you should mount dataset to google drive
 
