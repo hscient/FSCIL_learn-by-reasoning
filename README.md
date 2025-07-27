@@ -27,7 +27,7 @@
 
 * Google Colab (T4 / A100)
 * Ubuntu 22.04 + CUDA 11.8
-* Windows 10 local CUDA 12.6 + `torch==2.7.1+cu126`
+* Windows 10 local CUDA 12.6 + python 3.12 + `torch==2.7.1+cu126`
 
 ---
 
@@ -201,7 +201,7 @@ python main.py incremental_run \
 
 | Dataset      | Session‑0 | Final session | Paper (final) |
 | ------------ |:---------:|:-------------:|:------------:|
-| CIFAR‑100    |           |               |              |
+| CIFAR‑100    |   83.08   |               |              |
 
 Log files can be found under `logs/`.
 
