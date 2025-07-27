@@ -238,7 +238,7 @@ This implementation is released under the **MIT License**. See [LICENSE](LICENSE
 
 The original BiAG paper, its figures and tables are © the respective authors.
 
-Parts of the dataloader were adapted from the official implementation of **Constrained Few‑shot Class‑Incremental Learning**.
+Parts of the dataloader were adapted from the official implementation of CEC
 
 ---
 
