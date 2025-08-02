@@ -185,7 +185,7 @@ https://github.com/hscient/FSCIL_learn-by-reasoning/releases/tag/weights-cifar10
 
 ## Benchmark Results
 
-> **Note:** We are still hyper‑parameter tuning – results are **below** paper numbers.
+> **Note:** I'm still working on tuning the hyperparameters – results are **below** paper numbers.
 
 **CIFAR‑100 (paper):**
 
