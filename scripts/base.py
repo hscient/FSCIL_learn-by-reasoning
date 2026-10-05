@@ -9,7 +9,7 @@ import argparse
 from pathlib import Path
 import torch
 
-from code.utils.utils import confirm_overwrite
+from code.utils.utils import confirm_overwrite, seed_everything
 from code import config as C
 from code.data.base_loader import build_fscil_loaders
 from code.model.backbone import ResNet12, ResNet18
@@ -24,6 +24,7 @@ def main(args: argparse.Namespace | None = None):
         args = build_parser().parse_args()
 
     C.update_from_args(vars(args))
+    seed_everything(C.SEED)
     if getattr(args, "show_config", False):
         C.print_effective_config()
         if getattr(args, "save_config", None):
@@ -60,9 +61,9 @@ def main(args: argparse.Namespace | None = None):
 
     params = list(backbone.parameters()) + list(classifier.parameters())
     opt = torch.optim.SGD(params, lr=C.INIT_LR, momentum=0.9, weight_decay=5e-4)
-    sch = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=C.EPOCHS)
+    sch = torch.optim.lr_scheduler.MultiStepLR(opt, milestones=[100, 150], gamma=0.1)
 
-    logger = CSVLogger(exp_dir / "log.csv", fieldnames=["stage", "epoch", "acc", "loss", "lr"])
+    logger = CSVLogger(exp_dir / "base_log.csv", fieldnames=["stage", "epoch", "acc", "loss", "lr"])
 
     # Train
     backbone.to(device)
@@ -84,7 +85,7 @@ def main(args: argparse.Namespace | None = None):
     torch.save(classifier.state_dict(), pt_classifier)
     torch.save(protos.cpu(), pt_proto)
 
-    print("[joint] training complete ✓ — checkpoints saved to", exp_dir)
+    print("[joint] training complete - checkpoints saved to", exp_dir)
 
 
 if __name__ == "__main__":  # pragma: no cover

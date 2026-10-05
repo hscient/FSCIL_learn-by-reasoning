@@ -21,7 +21,7 @@ if DATASET_NAME.lower() == "miniimagenet" or DATASET_NAME.lower() == "mini_image
 elif DATASET_NAME.lower() == "cifar100":
     IMAGE_SIZE = CIFAR100_IMAGE_SIZE
 
-DATA_ROOT                = "/content/drive/MyDrive/Learn-by-Reasoning/code/data"  # miniimagenet directory (miniimagenet tar file) is located
+DATA_ROOT                = "./code/data"
 # DATA_ROOT                = "C:/Users/0dudd/PycharmProjects/Learn-by-Reasoning/code/data"
 
 # ╭──────────────── TRAINING (BASE) ───────╮
@@ -34,6 +34,7 @@ BATCH_INCREMENTAL_SIZE   = 64             # mini-batch when classifier expands
 # Augmentation switches
 MIXUP_ALPHA              = 1.0            
 MIX_PROB = 0.5
+USE_CUTMIX = True
 
 # ╭──────────────── BIAG (ANALOGICAL GEN) ─╮
 BIAG_EPOCHS              = 50
@@ -58,7 +59,7 @@ elif DATASET_NAME.lower() == "cifar100":
     NUM_CLASSES = 100
     WAY = 5
     SHOT = 5
-    SESSIONS = 8
+    SESSIONS = 9  # base session plus eight incremental sessions
 
 # evaluation detail level
 EVAL_TOP1_ONLY           = False
@@ -94,6 +95,11 @@ _INTERNAL_KEYS: Set[str] = {
 }
 
 def update_from_args(ns: dict):
+    global IMAGE_SIZE, DATASET_NAME, BACKBONE_MODEL
+    if ns.get("dataset") is not None:
+        DATASET_NAME = ns["dataset"].lower()
+        IMAGE_SIZE = MINI_IMAGE_SIZE if DATASET_NAME == "miniimagenet" else CIFAR100_IMAGE_SIZE
+        BACKBONE_MODEL = "resnet12" if DATASET_NAME == "miniimagenet" else "resnet18"
     for k, v in ns.items():
         if v is None:
             continue
@@ -101,7 +107,6 @@ def update_from_args(ns: dict):
         if key in globals():
             globals()[key] = v
 
-    global IMAGE_SIZE, DATASET_NAME
 #
 # def effective_config_dict():
 #     return {
@@ -138,7 +143,7 @@ CONFIG_GROUPS: Dict[str, Set[str]] = {
     },
     "base": {
         "EPOCHS", "INIT_LR", "BATCH_SIZE", "NUM_WORKERS",
-        "BACKBONE_MODEL", "MIXUP_ALPHA", "MIX_PROB", "SEED",
+        "BACKBONE_MODEL", "MIXUP_ALPHA", "MIX_PROB", "USE_CUTMIX", "SEED",
     },
     "biag": {
         "BIAG_EPOCHS", "BIAG_DEPTH", "BIAG_LR", "BIAG_OPTIMIZER",

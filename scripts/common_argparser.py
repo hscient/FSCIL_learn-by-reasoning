@@ -21,7 +21,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--backbone_model", type=str, choices=["resnet12", "resnet18"])
     p.add_argument("--batch_size", type=int)
     p.add_argument("--num_workers", type=int)
-    p.add_argument("--use_cutmix", action="store_true", default=False)
+    p.add_argument("--use_cutmix", action=argparse.BooleanOptionalAction, default=None)
+    p.add_argument("--biag_epochs", type=int, help="override C.BIAG_EPOCHS")
+    p.add_argument("--biag_lr", type=float, help="override C.BIAG_LR")
+    p.add_argument("--biag_depth", type=int, help="BiAG depth (must match the checkpoint at evaluation)")
 
     # base pt (backbone, classifier, proto) path
     p.add_argument(

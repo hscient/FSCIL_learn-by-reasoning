@@ -52,7 +52,7 @@ class CIFAR10(VisionDataset):
     }
 
     def __init__(self, root, train=True, transform=None, target_transform=None,
-                 download=False, index=None, base_sess=None):
+                  download=False, index=None, base_sess=None, do_augment=True):
 
         super(CIFAR10, self).__init__(root, transform=transform,
                                       target_transform=target_transform)
@@ -71,8 +71,8 @@ class CIFAR10(VisionDataset):
         # else:
         #     downloaded_list = self.test_list
 
-        if self.train:
-            downloaded_list = self.train_list
+        downloaded_list = self.train_list if self.train else self.test_list
+        if self.train and do_augment:
             self.transform = transforms.Compose([
                 transforms.RandomCrop(32, padding=4),
                 transforms.RandomHorizontalFlip(),
@@ -80,7 +80,6 @@ class CIFAR10(VisionDataset):
                 transforms.Normalize(mean=[0.507, 0.487, 0.441], std=[0.267, 0.256, 0.276])
             ])
         else:
-            downloaded_list = self.test_list
             self.transform = transforms.Compose([
                 transforms.ToTensor(),
                 transforms.Normalize(mean=[0.507, 0.487, 0.441], std=[0.267, 0.256, 0.276])

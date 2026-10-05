@@ -5,26 +5,21 @@ import code.config as C
 
 
 class BiAGWrapper(nn.Module):
-    def __init__(self, dim, depth=C.BIAG_DEPTH):
+    def __init__(self, dim, depth=None):
         super().__init__()
-        self.biag = BiAG(dim, depth)
+        self.biag = BiAG(dim, C.BIAG_DEPTH if depth is None else depth)
 
-        self.dec_embed = nn.Parameter(torch.empty(1, 1, dim))
-        nn.init.kaiming_normal_(self.dec_embed, nonlinearity='relu')
-
-        self.logit_alpha = nn.Parameter(torch.tensor(-3.0))
-
-    def forward(self, p_new, p_old, w_old, use_alphs=False):
-        if use_alphs:
-            e_dir      = F.normalize(self.dec_embed, dim=-1)
-            alpha      = F.softplus(self.logit_alpha)
-            dec_offset = alpha * e_dir
-            dec_raw =  p_new + dec_offset
-        else:
-            dec_raw = p_new
-
-        dec     = F.layer_norm(dec_raw, dec_raw.shape[-1:])
-
+    def forward(self, p_new, p_old, w_old):
+        # A single episode has B=1 and one token per new/old class.
+        if any(x.ndim != 3 or x.size(0) != 1 for x in (p_new, p_old, w_old)):
+            raise ValueError("BiAG expects one episode: (1, new_classes, D), (1, old_classes, D)")
+        if p_old.shape != w_old.shape or p_new.size(-1) != p_old.size(-1):
+            raise ValueError("Prototype and weight feature dimensions must match")
+        if p_new.size(1) == 0 or p_old.size(1) == 0:
+            raise ValueError("BiAG requires nonempty new and old class sets")
+        # Preserve the original default decoder initialization. The paper does
+        # not fully specify d_E initialization; this is an implementation choice.
+        dec = F.layer_norm(p_new, p_new.shape[-1:])
         return self.biag(p_new, p_old, w_old, dec)
 
 class SCM(nn.Module):
@@ -74,7 +69,7 @@ class WPAA(nn.Module):
     Two projection variants
     -----------------------
     proj_mode = "pre"   • Pre-project 2·D → D before attention  (compact)
-    proj_mode = "post"  • Run attention in 2·D space, then      (original paper)
+    proj_mode = "post"  • Run attention in 2·D space, then
                           project 2·D → D afterwards
     """
     def __init__(
@@ -144,40 +139,36 @@ class BiAGBlock(nn.Module):
     """A single reasoning layer."""
     def __init__(self, dim):
         super().__init__()
-        self.scm  = SCM(dim)
         self.wsa  = WSA(dim)
         self.wpaa = WPAA(dim)
-        self.gamma = nn.Parameter(torch.tensor(0.05))
 
-    def forward(self, q, dec, p_old, w_old):
-        W_s = self.scm(q)  # proto → weight
-        W_s = self.wsa(W_s, dec)  # WSA
-        q_P = self.scm(W_s)  # weight → proto
-        new_w = self.wpaa(W_s, q_P, w_old, p_old)  # WPAA (q_P not updated q)
-        q = q + self.gamma * self.scm(new_w)  # update AFTER WPAA, using SCM(new_w)
-        return F.normalize(new_w, dim=-1), F.normalize(q, dim=-1)
+    def forward(self, q, dec, p_old, w_old, scm):
+        converted_q = scm(q)
+        W_s = self.wsa(converted_q, dec)
+        # Both semantic branches originate from q_L (paper eqs. 7 and 10).
+        new_w = self.wpaa(W_s, converted_q, w_old, p_old)
+        q = q + scm(new_w)  # paper eq. 16, with SCM shared across layers
+        return F.normalize(new_w, dim=-1), q
 
 class BiAG(nn.Module):
     def __init__(self, dim, depth=4, hidden=4 * 256):
         super().__init__()
+        if depth < 1:
+            raise ValueError("BiAG depth must be positive")
+        self.scm = SCM(dim, hidden)
         self.blocks = nn.ModuleList(BiAGBlock(dim) for _ in range(depth))
-        self.mlp = nn.Sequential(
-            nn.Linear(dim, hidden), nn.ReLU(),
-            nn.Linear(hidden, dim)
-        )
 
     def forward(self, p_new, p_old, w_old, dec_embed):
         """
         p_new : (B , Nn , D)
         p_old : (B , No , D)
         w_old : (B , No , D)
-        dec_embed : (B , 1 , D)
+        dec_embed : (1 , Nn , D)
         returns  (Nn , D)   –– normalised generated weights for new classes
         """
         q = p_new
         for blk in self.blocks:
-            new_w, q = blk(q, dec_embed, p_old, w_old)
-            q = F.normalize(self.mlp(q), dim=-1)
+            new_w, q = blk(q, dec_embed, p_old, w_old, self.scm)
 
         # new_w is (B , Nn , D); episodes are batched one-at-a-time (B=1)
         new_w = new_w.squeeze(0)        # → (Nn , D)

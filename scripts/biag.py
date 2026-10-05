@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import torch, argparse
 from pathlib import Path
-from code.utils.utils import confirm_overwrite
+from code.utils.utils import confirm_overwrite, seed_everything
 from code import config as C
 from code.utils.logger import CSVLogger
 from code.utils.session_state import SessionState
@@ -17,6 +17,7 @@ def main(args=None):
         args = build_parser().parse_args()
 
     C.update_from_args(vars(args))
+    seed_everything(C.SEED)
     if getattr(args, "show_config", False):
         C.print_effective_config()
         if getattr(args, "save_config", None):
@@ -26,7 +27,8 @@ def main(args=None):
     exp_dir = Path(args.output_dir) / args.dataset; exp_dir.mkdir(parents=True, exist_ok=True)
 
     pt_best = Path(args.pt_biag_best) if args.pt_biag_best else exp_dir / "biag_pt_best.pt"
-    pt_last = Path(args.pt_biag_last) if args.pt_biag_last else exp_dir / "biag_pt_last.pt"
+    last_path = args.pt_biag_last or args.biag
+    pt_last = Path(last_path) if last_path else exp_dir / "biag_pt_last.pt"
     for p in (pt_best, pt_last):
         p.parent.mkdir(parents=True, exist_ok=True)
 
@@ -51,24 +53,14 @@ def main(args=None):
     # BiAG wrapper & optimiser
     biag = BiAGWrapper(backbone.out_dim).to(device)
     base_lr = C.BIAG_LR; wd=1e-2
-    # dec_emged, alpha is optional (default : False)
-    high_lr_keywords = {"dec_embed","alpha"}; no_wd_keywords={"gamma"}
-    decay_params, no_decay_params, dec_embed_params = [], [], []
-    for n,p in biag.named_parameters():
-        if any(k in n for k in high_lr_keywords): dec_embed_params.append(p)
-        elif any(k in n for k in no_wd_keywords): no_decay_params.append(p)
-        else: decay_params.append(p)
-    optim = torch.optim.AdamW([
-        {"params":decay_params,"lr":base_lr,"weight_decay":wd},
-        {"params":no_decay_params,"lr":base_lr,"weight_decay":0.0},
-        {"params":dec_embed_params,"lr":base_lr*10,"weight_decay":0.0}], betas=(0.9,0.999))
+    optim = torch.optim.AdamW(biag.parameters(), lr=base_lr, weight_decay=wd, betas=(0.9, 0.999))
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=C.BIAG_EPOCHS*C.PSEUDO_EPISODES_PER_EPOCH)
 
-    logger = CSVLogger(exp_dir/"log.csv", fieldnames=["stage","epoch","loss","cos"])
+    logger = CSVLogger(exp_dir/"biag_log.csv", fieldnames=["stage","epoch","loss","cos"])
 
     best_state, final_state, best_cos = E.run(state, biag, C.BIAG_EPOCHS, C.PSEUDO_EPISODES_PER_EPOCH, optim, sched, logger)
     torch.save(best_state, pt_best); torch.save(final_state, pt_last)
-    print(f"[biag] finished ✓  best cos={best_cos:.4f}")
+    print(f"[biag] finished - best cos={best_cos:.4f}")
 
 if __name__ == "__main__":
     main()
