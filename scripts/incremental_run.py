@@ -35,17 +35,19 @@ def main(cli_args: argparse.Namespace | None = None):
     results = IE.evaluate(loaders, state)
 
     # write log
-    logger = CSVLogger(metrics_csv, fieldnames=["stage","session","acc","forget","mean_all","mean_inc"])
+    logger = CSVLogger(metrics_csv, fieldnames=["stage","session","acc","base_acc","novel_acc","forget","mean_all","mean_inc"])
     for i, acc in enumerate(results["acc_sessions"]):
         fg = 0.0 if i==0 else results["forgetting"][i-1]
-        logger.log(stage="run", session=i, acc=acc, forget=fg)
+        logger.log(stage="run", session=i, acc=acc, forget=fg,
+                   base_acc=results["base_acc_sessions"][i],
+                   novel_acc=results["novel_acc_sessions"][i])
     # aggregate rows
     logger.log(stage="run", session="mean_all", acc=results["mean_all"], forget="-")
     logger.log(stage="run", session="mean_inc", acc=results["mean_inc"], forget="-")
 
     with open(exp_run/"summary.json", "w") as fp:
         json.dump(results, fp, indent=2)
-    print(f"[run] finished ✓  results saved to {metrics_csv}")
+    print(f"[run] finished - results saved to {metrics_csv}")
 
 
 if __name__ == "__main__":

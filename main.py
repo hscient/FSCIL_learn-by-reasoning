@@ -34,12 +34,6 @@ def build_main_parser() -> argparse.ArgumentParser:
     add_stage("incremental_run")
     add_stage("all")
 
-    for s in ("biag", "all"):
-        g = sub.choices[s]
-        g.add_argument("--biag_epochs", type=int, help="override C.BIAG_EPOCHS")
-        g.add_argument("--biag_lr",     type=float, help="override C.BIAG_LR")
-        g.add_argument("--biag_depth",  type=int, help="override depth if used in your impl")
-
     return p
 
 

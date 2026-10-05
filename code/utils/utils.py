@@ -26,7 +26,19 @@ from typing import Sequence
 
 __all__ = [
     "confirm_overwrite",
+    "seed_everything",
 ]
+
+def seed_everything(seed: int) -> None:
+    """Seed training, episode sampling and augmentation in each CLI stage."""
+    import random
+    import numpy as np
+    import torch
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
 
 def _all_exist(paths: Sequence[Path]) -> bool:  # pragma: no cover
     """Return ``True`` iff *all* paths exist on disk."""
